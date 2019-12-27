@@ -14,14 +14,15 @@ input_data <- as.data.frame(input_data)
 nms <- names(input_data)
 
 ui <- fluidPage(
-  titlePanel("QIBC"),
-  sidebarPanel(
-    selectInput('x', 'X', choices = nms, selected = x.axis),
-    selectInput('y', 'Y', choices = nms, selected = y.axis)
-  ),
-mainPanel(
-  plotlyOutput('qibcPlot', height = '600px')
+  titlePanel('QIBC'),
+  plotlyOutput('qibcPlot', height = '400px', width = '400px'),
+  fluidRow(
+    column(6,
+           selectInput('x', 'X', choices = nms, selected = x.axis, width = '100%')),
+    column(6, 
+           selectInput('y', 'Y', choices = nms, selected = y.axis, width = '100%'))
   )
+
 )
 
 server <- function(input, output) {
