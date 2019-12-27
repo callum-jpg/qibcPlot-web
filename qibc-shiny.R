@@ -10,8 +10,6 @@ metadata <- 'Metadata_FolderName'
 
 input_data <- fread(input_file, stringsAsFactors = TRUE)
 
-input_data <- as.data.frame(input_data)
-
 nms <- names(input_data)
 condition_names <- levels(input_data[, get(metadata)])
 
@@ -24,17 +22,24 @@ ui <- fluidPage(
     column(6,
            selectInput('x', 'X', choices = nms, selected = x.axis, width = '100%'),
            selectInput('meta', 'Condition Name', choices = condition_names),
-           sliderInput('xlim', 'X min/max', min = 1, max = 1e7, value = 1000)),
+           sliderInput('xlim', 'X min/max', min = 1, max = 1e7, value = 1e7)),
     column(6, 
            selectInput('y', 'Y', choices = nms, selected = y.axis, width = '100%'))
   )
 
 )
 
-server <- function(input, output) {
+server <- function(input, output, session) {
+  
+  ## Updating a slider based on condition selected
+  observe({
+    val <- input$x
+    updateSliderInput(session, 'xlim', value = val, 
+                      min = round(min(input_data[get(metadata) == input$meta]$Location_CenterMassIntensity_X_rescalecy5channel)))
+  })
   
   dataset <- reactive({
-    input_data[get(metadata) == input$meta]
+    input_data[get(metadata) == input$meta & input$x >= 4e6]
   })
   
   output$qibcPlot <- renderPlotly({
