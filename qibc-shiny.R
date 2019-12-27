@@ -25,7 +25,7 @@ ui <- fluidPage(
            sliderInput('xlim', 'X min/max', min = 1, max = 1e7, value = c(1, 1e7))),
     column(6, 
            selectInput('y', 'Y', choices = nms, selected = y.axis, width = '100%'),
-           numericInput('xmin', 'x min', value = 10, min = 1, max = 10))
+           numericInput('xmin', 'x min', value = 1e1))
   )
 
 )
@@ -40,6 +40,13 @@ server <- function(input, output, session) {
                       min = round(min(input_data[get(metadata) == input$meta][[input$x]])),
                       max = round(max(input_data[get(metadata) == input$meta][[input$x]]))
     )
+  })
+  
+  observe({
+    # For updating numeric field
+    updateNumericInput(session, 'xmin', value = round(min(input_data[get(metadata) == input$meta][[input$x]])),
+                       min = round(min(input_data[get(metadata) == input$meta][[input$x]])),
+                       max = round(max(input_data[get(metadata) == input$meta][[input$x]])))
   })
   
   dataset <- reactive({
