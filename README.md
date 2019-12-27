@@ -4,3 +4,9 @@
 - Jitter dot/bar plot
 - Cell cycle gating
     - Quantification of marker expression in specific cell sub-populations
+
+## Pre-requisites
+Specifically, the required system dependencies for installing plotly
+- Linux
+  - libssl-dev
+  - libcurl4-openssl-dev
