@@ -35,7 +35,7 @@ server <- function(input, output, session) {
   observe({
     val <- input$x
     updateSliderInput(session, 'xlim', value = val, 
-                      min = round(min(input_data[get(metadata) == input$meta]$Location_CenterMassIntensity_X_rescalecy5channel)))
+                      min = round(max(input_data[get(metadata) == input$meta][[input$x]])))
   })
   
   dataset <- reactive({
