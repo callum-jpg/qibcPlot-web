@@ -6,6 +6,7 @@ library(data.table)
 input_file <- 'example_data/Nuclei.csv'
 x.axis <- 'Intensity_IntegratedIntensity_rescaledapichannel'
 y.axis <-  'Intensity_MeanIntensity_rescalecy5channel'
+point.colour <- 'Intensity_MeanIntensity_rescalemcherrychannel'
 metadata <- 'Metadata_FolderName'
 
 input_data <- fread(input_file, stringsAsFactors = TRUE)
@@ -25,12 +26,18 @@ ui <- fluidPage(
            sliderInput('xlim', 'X min/max', min = 1, max = 1e7, value = c(1, 1e7))),
     column(6, 
            selectInput('y', 'Y', choices = nms, selected = y.axis, width = '100%'),
-           numericInput('xmin', 'x min', value = 1e1))
+           selectInput('colour', 'Point colour', choices = nms, selected = point.colour, width = '100%'),
+           numericInput('xmin', 'x min', value = 1),
+           textOutput('test_print'))
   )
 
 )
 
 server <- function(input, output, session) {
+  
+  output$test_print <- renderText ({
+    paste('print test:', input$x)
+  })
   
   ## Updating a slider based on condition selected
   observe({
@@ -50,7 +57,8 @@ server <- function(input, output, session) {
   })
   
   dataset <- reactive({
-    input_data[get(metadata) == input$meta & input$x >= 4e6]
+    input_data[get(metadata) == input$meta
+    & get(input$x) %inrange% input$xlim] # Filtering data based on x-axis
   })
   
   output$qibcPlot <- renderPlotly({
