@@ -86,6 +86,10 @@ server <- function(input, output, session) {
     plot <- ggplot(dataset(), 
                    aes_string(x = input$x, 
                               y = input$y)) +
+      # First geom_point added to give second geom_points an outline
+      geom_point(shape = 21, size = 2, stroke = 0.5, colour = "#aaaaaa",
+                 aes_string(input$x, input$y)) +
+      # Second geom_point
       geom_point(shape = 21, size = 1, 
                  #colour = "#aaaaaa", 
                  stroke = 1,
@@ -94,6 +98,7 @@ server <- function(input, output, session) {
                  # Use colour (outline of pch 21) and set the stroke to occupy the whole geom_point
                  # This mimics fill, but loses the ability to add a point outline
                  aes(colour = get(input$colour))) + 
+
       scale_colour_gradient(trans = 'pseudo_log', low = 'gray', high = 'red') +
       {if(input$ytrans == 'log10')scale_y_log10()} + # Select ylog10
       {if(input$ytrans == 'linear')scale_y_continuous()} # Select y continuous
