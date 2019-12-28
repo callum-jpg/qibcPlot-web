@@ -13,6 +13,7 @@ input_data <- fread(input_file, stringsAsFactors = TRUE)
 
 nms <- names(input_data)
 condition_names <- levels(input_data[, get(metadata)])
+trans <- c('linear', 'log10')
 
 ui <- fluidPage(
   titlePanel('QIBC'),
@@ -28,6 +29,7 @@ ui <- fluidPage(
            selectInput('y', 'Y', choices = nms, selected = y.axis, width = '100%'),
            selectInput('colour', 'Point colour', choices = nms, selected = point.colour, width = '100%'),
            sliderInput('ylim', 'y min/max', min = 1, max = 1e7, value = c(1, 1e7)),
+           selectInput('ytrans', 'y transformation', choices = trans, selected = 'log10', width = '100%'),
            numericInput('xmin', 'x min', value = 1),
            textOutput('test_print'))
   )
@@ -77,7 +79,9 @@ server <- function(input, output, session) {
     plot <- ggplot(dataset(), 
                    aes_string(x = input$x, 
                               y = input$y)) +
-      geom_point(shape = 21, size = 3, colour = "#aaaaaa", stroke = 0.5)
+      geom_point(shape = 21, size = 3, colour = "#aaaaaa", stroke = 0.5) +
+      {if(input$ytrans == 'log10')scale_y_log10()} + # Select y log10
+      {if(input$ytrans == 'linear')scale_y_continuous()} # Select ylog continuous
   })
   
     
