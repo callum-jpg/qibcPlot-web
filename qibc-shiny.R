@@ -3,7 +3,9 @@ library(plotly)
 library(shiny)
 library(data.table)
 
-input_file <- 'example_data/Nuclei.csv'
+input_file1 <- 'example_data/Nuclei.csv'
+
+input_file <- 'example_data/Nuclei_small.csv'
 x.axis <- 'Intensity_IntegratedIntensity_rescaledapichannel'
 y.axis <-  'Intensity_MeanIntensity_rescalecy5channel'
 point.colour <- 'Intensity_MeanIntensity_rescalemcherrychannel'
@@ -26,6 +28,7 @@ ui <- fluidPage(
            selectInput('x', 'X', choices = nms, selected = x.axis, width = '100%'),
            #br(),
            h3('use metadata?'),
+           ## Checkbox TRUE for dev purposes. Switch back to FALSE
            checkboxInput('meta_check', 'Use metadata?', FALSE, width = '100%'),
            #br(),
            selectInput('meta', 'Condition Name', ""),
@@ -37,16 +40,32 @@ ui <- fluidPage(
            selectInput('ytrans', 'y transformation', choices = trans, selected = 'log10', width = '100%'),
            sliderInput('ylim', 'y min/max', min = 1, max = 1e7, value = c(1, 1e7), width = '100%'),
            sliderInput('colour_lim', 'colour min/max', min = 1, max = 3000, value = c(1, 100), width = '100%'),
-           numericInput('xmin', 'x min', value = 1),
            textOutput('test_print'))
+  ),
+  fluidRow(
+    column(3,
+           numericInput('xmin', 'x min', value = '')),
+    column(3, 
+           numericInput('xmax', 'x max', value = '')),
+    column(3, 
+           numericInput('ymin', 'y min', value = '')),
+    column(3, 
+           numericInput('ymax', 'y max', value = ''))
+  ),
+  fluidRow(
+    column(3, 
+           numericInput('colour_min', 'colour min', value = '')),
+    column(3,
+           numericInput('colour_max', 'colour max', value = ''))
   )
+  
 
 )
 
 server <- function(input, output, session) {
   
   output$test_print <- renderText ({
-    paste('print test:', input$meta_col == input$meta)
+    paste('print test:', nchar(input$xmin))
   })
   observe({
     ## Update meta_col with column names containing Metadata if meta_check is TRUE
@@ -96,42 +115,42 @@ server <- function(input, output, session) {
     ## Updating the point colour slider based on condition selected. Finds total dataset min max if no metadata selected.
     {
       if(nchar(input$meta) >= 1)
-        updateSliderInput(session, 'ylim', value = c(round(min(input_data[get(input$meta_col) == input$meta][[input$colour]])),
+        updateSliderInput(session, 'colour_lim', value = c(round(min(input_data[get(input$meta_col) == input$meta][[input$colour]])),
                                                      round(max(input_data[get(input$meta_col) == input$meta][[input$colour]]))),
                           min = round(min(input_data[get(input$meta_col) == input$meta][[input$colour]])),
                           max = round(max(input_data[get(input$meta_col) == input$meta][[input$colour]])))
       else 
-        updateSliderInput(session, 'ylim', value = c(round(min(input_data[,get(input$colour)])),
+        updateSliderInput(session, 'colour_lim', value = c(round(min(input_data[,get(input$colour)])),
                                                      round(max(input_data[,get(input$colour)]))),
                           min = round(min(input_data[,get(input$colour)])),
                           max = round(max(input_data[,get(input$colour)])))
     }
   })
 
-  # observe({
-  #   ## Updating a point colour limit slider based on condition selected
-  #   updateSliderInput(session, 'colour_lim', value = c(round(min(input_data[get(metadata) == input$meta][[input$colour]])),
-  #                                                round(max(input_data[get(metadata) == input$meta][[input$colour]]))), 
-  #                     min = round(min(input_data[get(metadata) == input$meta][[input$colour]])),
-  #                     max = round(max(input_data[get(metadata) == input$meta][[input$colour]]))
-  #   )
-  # })
-  # observe({
-  #   # For updating numeric field
-  #   updateNumericInput(session, 'xmin', value = round(min(input_data[get(metadata) == input$meta][[input$x]])),
-  #                      min = round(min(input_data[get(metadata) == input$meta][[input$x]])),
-  #                      max = round(max(input_data[get(metadata) == input$meta][[input$x]])))
-  # })
-  # 
   dataset <- reactive({
     input_data[
       # If metadata is selected, filter dataset based on metadata values
       {if(nchar(input$meta) >= 1)get(input$meta_col) == input$meta
       # else, plot all available data
-      else '' %like% ''}
-    & get(input$x) %inrange% input$xlim
-    & get(input$y) %inrange% input$ylim
-    & get(input$colour) %inrange% input$colour_lim
+      else '' %like% ''} 
+        
+      # Allow for numericInput to persist between metadata selections and override slider
+    & {if(nchar(input$xmin) >= 1 & nchar(input$xmax) >= 1 & 
+          # if NA, if does not evaluate
+          !is.na(nchar(input$xmin)) & !is.na(nchar(input$xmax)))get(input$x) %inrange% c(input$xmin, input$xmax)
+       else get(input$x) %inrange% input$xlim}
+      
+     & {if(nchar(input$ymin) >= 1 & nchar(input$ymax) >= 1 & 
+          !is.na(nchar(input$ymin)) & !is.na(nchar(input$ymax)))get(input$y) %inrange% c(input$ymin, input$ymax)
+        else get(input$y) %inrange% input$ylim}
+    
+    & {if(nchar(input$colour_min) >= 1 & nchar(input$colour_max) >= 1 & 
+          !is.na(nchar(input$colour_min)) & !is.na(nchar(input$colour_max)))
+      get(input$colour) %inrange% c(input$colour_min, input$colour_max)
+      else get(input$colour) %inrange% input$colour_lim}
+    #& get(input$x) %inrange% input$xlim
+    # & get(input$y) %inrange% input$ylim
+    # & get(input$colour) %inrange% input$colour_lim
     ]
   })
   
@@ -160,6 +179,9 @@ server <- function(input, output, session) {
 
 shinyApp(ui, server)
 
-
-
-
+low.test <- 1
+high.test <- 1e6
+lh.test <- c(low.test, high.test)
+head(input_data[get(x.axis) %inrange% c(low.test, high.test)])
+head(input_data[get(x.axis) %inrange% lh.test])
+{if(T==T & F==T) print('if') else print('else')}
