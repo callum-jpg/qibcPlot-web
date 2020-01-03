@@ -148,9 +148,6 @@ server <- function(input, output, session) {
           !is.na(nchar(input$colour_min)) & !is.na(nchar(input$colour_max)))
       get(input$colour) %inrange% c(input$colour_min, input$colour_max)
       else get(input$colour) %inrange% input$colour_lim}
-    #& get(input$x) %inrange% input$xlim
-    # & get(input$y) %inrange% input$ylim
-    # & get(input$colour) %inrange% input$colour_lim
     ]
   })
   
@@ -179,9 +176,3 @@ server <- function(input, output, session) {
 
 shinyApp(ui, server)
 
-low.test <- 1
-high.test <- 1e6
-lh.test <- c(low.test, high.test)
-head(input_data[get(x.axis) %inrange% c(low.test, high.test)])
-head(input_data[get(x.axis) %inrange% lh.test])
-{if(T==T & F==T) print('if') else print('else')}
