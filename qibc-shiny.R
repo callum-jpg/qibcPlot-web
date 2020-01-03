@@ -60,22 +60,54 @@ server <- function(input, output, session) {
       else updateSelectInput(session, 'meta' , choices = "")}
   })
   
-  # observe({
-  #   ## Updating a xlim slider based on condition selected
-  #   updateSliderInput(session, 'xlim', value = c(round(min(input_data[get(metadata) == input$meta][[input$x]])),
-  #                                                round(max(input_data[get(metadata) == input$meta][[input$x]]))), 
-  #                     min = round(min(input_data[get(metadata) == input$meta][[input$x]])),
-  #                     max = round(max(input_data[get(metadata) == input$meta][[input$x]]))
-  #   )
-  # })
-  # observe({
-  #   ## Updating a xlim slider based on condition selected
-  #   updateSliderInput(session, 'ylim', value = c(round(min(input_data[get(metadata) == input$meta][[input$y]])),
-  #                                                round(max(input_data[get(metadata) == input$meta][[input$y]]))), 
-  #                     min = round(min(input_data[get(metadata) == input$meta][[input$y]])),
-  #                     max = round(max(input_data[get(metadata) == input$meta][[input$y]]))
-  #   )
-  # })
+  observe({
+    ## Updating a xlim slider based on condition selected. Finds total dataset min max if no metadata selected.
+    {
+      if(nchar(input$meta) >= 1)
+        updateSliderInput(session, 'xlim', value = c(round(min(input_data[get(input$meta_col) == input$meta][[input$x]])),
+                                                 round(max(input_data[get(input$meta_col) == input$meta][[input$x]]))),
+                      min = round(min(input_data[get(input$meta_col) == input$meta][[input$x]])),
+                      max = round(max(input_data[get(input$meta_col) == input$meta][[input$x]])))
+      else 
+        updateSliderInput(session, 'xlim', value = c(round(min(input_data[,get(input$x)])),
+                                                     round(max(input_data[,get(input$x)]))),
+                                   min = round(min(input_data[,get(input$x)])),
+                                   max = round(max(input_data[,get(input$x)])))
+      }
+  })
+  
+  observe({
+    ## Updating the ylim slider based on condition selected. Finds total dataset min max if no metadata selected.
+    {
+      if(nchar(input$meta) >= 1)
+        updateSliderInput(session, 'ylim', value = c(round(min(input_data[get(input$meta_col) == input$meta][[input$y]])),
+                                                     round(max(input_data[get(input$meta_col) == input$meta][[input$y]]))),
+                          min = round(min(input_data[get(input$meta_col) == input$meta][[input$y]])),
+                          max = round(max(input_data[get(input$meta_col) == input$meta][[input$y]])))
+      else 
+        updateSliderInput(session, 'ylim', value = c(round(min(input_data[,get(input$y)])),
+                                                     round(max(input_data[,get(input$y)]))),
+                          min = round(min(input_data[,get(input$y)])),
+                          max = round(max(input_data[,get(input$y)])))
+    }
+  })
+  
+  observe({
+    ## Updating the point colour slider based on condition selected. Finds total dataset min max if no metadata selected.
+    {
+      if(nchar(input$meta) >= 1)
+        updateSliderInput(session, 'ylim', value = c(round(min(input_data[get(input$meta_col) == input$meta][[input$colour]])),
+                                                     round(max(input_data[get(input$meta_col) == input$meta][[input$colour]]))),
+                          min = round(min(input_data[get(input$meta_col) == input$meta][[input$colour]])),
+                          max = round(max(input_data[get(input$meta_col) == input$meta][[input$colour]])))
+      else 
+        updateSliderInput(session, 'ylim', value = c(round(min(input_data[,get(input$colour)])),
+                                                     round(max(input_data[,get(input$colour)]))),
+                          min = round(min(input_data[,get(input$colour)])),
+                          max = round(max(input_data[,get(input$colour)])))
+    }
+  })
+
   # observe({
   #   ## Updating a point colour limit slider based on condition selected
   #   updateSliderInput(session, 'colour_lim', value = c(round(min(input_data[get(metadata) == input$meta][[input$colour]])),
