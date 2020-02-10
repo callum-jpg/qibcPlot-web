@@ -135,15 +135,18 @@ server <- function(input, output, session) {
       else '' %like% ''} 
         
       # Allow for numericInput to persist between metadata selections and override slider
+      # xlim from slider or textInput
     & {if(nchar(input$xmin) >= 1 & nchar(input$xmax) >= 1 & 
           # if NA, if does not evaluate
           !is.na(nchar(input$xmin)) & !is.na(nchar(input$xmax)))get(input$x) %inrange% c(input$xmin, input$xmax)
        else get(input$x) %inrange% input$xlim}
       
+    # ylim from slider or textInput
      & {if(nchar(input$ymin) >= 1 & nchar(input$ymax) >= 1 & 
           !is.na(nchar(input$ymin)) & !is.na(nchar(input$ymax)))get(input$y) %inrange% c(input$ymin, input$ymax)
         else get(input$y) %inrange% input$ylim}
     
+    # colour limits from slider or textInput
     & {if(nchar(input$colour_min) >= 1 & nchar(input$colour_max) >= 1 & 
           !is.na(nchar(input$colour_min)) & !is.na(nchar(input$colour_max)))
       get(input$colour) %inrange% c(input$colour_min, input$colour_max)
