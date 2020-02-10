@@ -19,15 +19,15 @@ condition_names <- levels(input_data[, get(metadata)])
 trans <- c('linear', 'log10')
 
 ui <- fluidPage(
-  titlePanel('QIBC'),
+  titlePanel('qibcPlot'),
   fluidRow(
     column(12, align = 'center', plotlyOutput('qibcPlot', height = '500px', width = '700px'))
     ),
   fluidRow(
     column(6,
-           selectInput('x', 'X', choices = nms, selected = x.axis, width = '100%'),
+           selectInput('x', 'X axis', choices = nms, selected = x.axis, width = '100%'),
            #br(),
-           h3('use metadata?'),
+           h3('Use metadata?'),
            ## Checkbox TRUE for dev purposes. Switch back to FALSE
            checkboxInput('meta_check', 'Use metadata?', FALSE, width = '100%'),
            #br(),
@@ -35,7 +35,7 @@ ui <- fluidPage(
            sliderInput('xlim', 'X min/max', min = 1, max = 1e7, value = c(1, 1e7), width = '100%'),
            selectInput('colour', 'Point colour', choices = nms, selected = point.colour, width = '100%')),
     column(6, 
-           selectInput('y', 'Y', choices = nms, selected = y.axis, width = '100%'),
+           selectInput('y', 'Y axis', choices = nms, selected = y.axis, width = '100%'),
            selectInput('meta_col', 'Metadata Column', "", width = "100%"),
            selectInput('ytrans', 'y transformation', choices = trans, selected = 'log10', width = '100%'),
            sliderInput('ylim', 'y min/max', min = 1, max = 1e7, value = c(1, 1e7), width = '100%'),
