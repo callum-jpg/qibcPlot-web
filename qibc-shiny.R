@@ -169,7 +169,18 @@ server <- function(input, output, session) {
 
       scale_colour_gradient(trans = 'pseudo_log', low = 'gray', high = 'red') +
       {if(input$ytrans == 'log10')scale_y_log10()} + # Select ylog10
-      {if(input$ytrans == 'linear')scale_y_continuous()} # Select y continuous
+      {if(input$ytrans == 'linear')scale_y_continuous()} + # Select y continuous
+      # Theme
+      theme_minimal() +
+      theme(
+            axis.text.x = element_text(angle=20, hjust=1),
+            # Remove gridlines
+            panel.grid.major.x = element_blank(),
+            panel.grid.minor.x = element_blank(),
+            panel.grid.major.y = element_blank(),
+            panel.grid.minor.y = element_blank(),
+            axis.line.x = element_line(color="gray70", size = 1),
+            axis.line.y = element_line(color="gray70", size = 1))
   })
 }
 
