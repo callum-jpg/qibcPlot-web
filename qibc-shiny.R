@@ -3,6 +3,8 @@ library(plotly)
 library(shiny)
 library(data.table)
 
+# for deployment-branch
+
 input_file1 <- 'example_data/Nuclei.csv'
 
 input_file <- 'example_data/Nuclei_small.csv'
@@ -22,7 +24,7 @@ ui <- fluidPage(
   titlePanel('qibcPlot'),
   fluidRow(
     column(12, align = 'center', plotlyOutput('qibcPlot', height = '500px', width = '700px'))
-    ),
+  ),
   fluidRow(
     column(6,
            selectInput('x', 'X axis', choices = nms, selected = x.axis, width = '100%'),
@@ -59,7 +61,7 @@ ui <- fluidPage(
            numericInput('colour_max', 'colour max', value = ''))
   )
   
-
+  
 )
 
 server <- function(input, output, session) {
@@ -84,15 +86,15 @@ server <- function(input, output, session) {
     {
       if(nchar(input$meta) >= 1)
         updateSliderInput(session, 'xlim', value = c(round(min(input_data[get(input$meta_col) == input$meta][[input$x]])),
-                                                 round(max(input_data[get(input$meta_col) == input$meta][[input$x]]))),
-                      min = round(min(input_data[get(input$meta_col) == input$meta][[input$x]])),
-                      max = round(max(input_data[get(input$meta_col) == input$meta][[input$x]])))
+                                                     round(max(input_data[get(input$meta_col) == input$meta][[input$x]]))),
+                          min = round(min(input_data[get(input$meta_col) == input$meta][[input$x]])),
+                          max = round(max(input_data[get(input$meta_col) == input$meta][[input$x]])))
       else 
         updateSliderInput(session, 'xlim', value = c(round(min(input_data[,get(input$x)])),
                                                      round(max(input_data[,get(input$x)]))),
-                                   min = round(min(input_data[,get(input$x)])),
-                                   max = round(max(input_data[,get(input$x)])))
-      }
+                          min = round(min(input_data[,get(input$x)])),
+                          max = round(max(input_data[,get(input$x)])))
+    }
   })
   
   observe({
@@ -116,41 +118,41 @@ server <- function(input, output, session) {
     {
       if(nchar(input$meta) >= 1)
         updateSliderInput(session, 'colour_lim', value = c(round(min(input_data[get(input$meta_col) == input$meta][[input$colour]])),
-                                                     round(max(input_data[get(input$meta_col) == input$meta][[input$colour]]))),
+                                                           round(max(input_data[get(input$meta_col) == input$meta][[input$colour]]))),
                           min = round(min(input_data[get(input$meta_col) == input$meta][[input$colour]])),
                           max = round(max(input_data[get(input$meta_col) == input$meta][[input$colour]])))
       else 
         updateSliderInput(session, 'colour_lim', value = c(round(min(input_data[,get(input$colour)])),
-                                                     round(max(input_data[,get(input$colour)]))),
+                                                           round(max(input_data[,get(input$colour)]))),
                           min = round(min(input_data[,get(input$colour)])),
                           max = round(max(input_data[,get(input$colour)])))
     }
   })
-
+  
   dataset <- reactive({
     input_data[
       # If metadata is selected, filter dataset based on metadata values
       {if(nchar(input$meta) >= 1)get(input$meta_col) == input$meta
-      # else, plot all available data
-      else '' %like% ''} 
-        
+        # else, plot all available data
+        else '' %like% ''} 
+      
       # Allow for numericInput to persist between metadata selections and override slider
       # xlim from slider or textInput
-    & {if(nchar(input$xmin) >= 1 & nchar(input$xmax) >= 1 & 
-          # if NA, if does not evaluate
-          !is.na(nchar(input$xmin)) & !is.na(nchar(input$xmax)))get(input$x) %inrange% c(input$xmin, input$xmax)
-       else get(input$x) %inrange% input$xlim}
+      & {if(nchar(input$xmin) >= 1 & nchar(input$xmax) >= 1 & 
+            # if NA, if does not evaluate
+            !is.na(nchar(input$xmin)) & !is.na(nchar(input$xmax)))get(input$x) %inrange% c(input$xmin, input$xmax)
+        else get(input$x) %inrange% input$xlim}
       
-    # ylim from slider or textInput
-     & {if(nchar(input$ymin) >= 1 & nchar(input$ymax) >= 1 & 
-          !is.na(nchar(input$ymin)) & !is.na(nchar(input$ymax)))get(input$y) %inrange% c(input$ymin, input$ymax)
+      # ylim from slider or textInput
+      & {if(nchar(input$ymin) >= 1 & nchar(input$ymax) >= 1 & 
+            !is.na(nchar(input$ymin)) & !is.na(nchar(input$ymax)))get(input$y) %inrange% c(input$ymin, input$ymax)
         else get(input$y) %inrange% input$ylim}
-    
-    # colour limits from slider or textInput
-    & {if(nchar(input$colour_min) >= 1 & nchar(input$colour_max) >= 1 & 
-          !is.na(nchar(input$colour_min)) & !is.na(nchar(input$colour_max)))
-      get(input$colour) %inrange% c(input$colour_min, input$colour_max)
-      else get(input$colour) %inrange% input$colour_lim}
+      
+      # colour limits from slider or textInput
+      & {if(nchar(input$colour_min) >= 1 & nchar(input$colour_max) >= 1 & 
+            !is.na(nchar(input$colour_min)) & !is.na(nchar(input$colour_max)))
+        get(input$colour) %inrange% c(input$colour_min, input$colour_max)
+        else get(input$colour) %inrange% input$colour_lim}
     ]
   })
   
@@ -169,21 +171,21 @@ server <- function(input, output, session) {
                  # Use colour (outline of pch 21) and set the stroke to occupy the whole geom_point
                  # This mimics fill, but loses the ability to add a point outline
                  aes(colour = get(input$colour))) + 
-
+      
       scale_colour_gradient(trans = 'pseudo_log', low = 'gray', high = 'red') +
       {if(input$ytrans == 'log10')scale_y_log10()} + # Select ylog10
       {if(input$ytrans == 'linear')scale_y_continuous()} + # Select y continuous
       # Theme
       theme_minimal() +
       theme(
-            axis.text.x = element_text(angle=20, hjust=1),
-            # Remove gridlines
-            panel.grid.major.x = element_blank(),
-            panel.grid.minor.x = element_blank(),
-            panel.grid.major.y = element_blank(),
-            panel.grid.minor.y = element_blank(),
-            axis.line.x = element_line(color="gray70", size = 1),
-            axis.line.y = element_line(color="gray70", size = 1))
+        axis.text.x = element_text(angle=20, hjust=1),
+        # Remove gridlines
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        axis.line.x = element_line(color="gray70", size = 1),
+        axis.line.y = element_line(color="gray70", size = 1))
   })
 }
 
