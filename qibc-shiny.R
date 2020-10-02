@@ -2,23 +2,29 @@ library(ggplot2)
 library(plotly)
 library(shiny)
 library(data.table)
+library(RColorBrewer)
 
 # for deployment-branch
 
-input_file1 <- 'example_data/Nuclei.csv'
+input_file <- 'example_data/shiny_data.csv'
 
-input_file <- 'example_data/Nuclei_small.csv'
-x.axis <- 'Intensity_IntegratedIntensity_rescaledapichannel'
-y.axis <-  'Intensity_MeanIntensity_rescalecy5channel'
-point.colour <- 'Intensity_MeanIntensity_rescalemcherrychannel'
-metadata <- 'Metadata_FolderName'
+x.axis <- 'Total_DAPI_Intensity'
+y.axis <-  'Mean_PCNA_Intensity'
+point.colour <- 'Mean_γH2AX_intensity'
+metadata <- 'Condition'
 
 input_data <- fread(input_file, stringsAsFactors = TRUE)
 
 nms <- names(input_data)
-meta.nms <- nms[grepl('Meta', nms)]
+#meta.nms <- nms[grepl('Meta', nms)]
+meta.nms <- nms
 condition_names <- levels(input_data[, get(metadata)])
 trans <- c('linear', 'log10')
+
+# Plotting colours
+# Orange, red, blue, pink, purple, green, gray
+colour.palette <- c('#ffb86c', '#ff5555', '#8be9fd', '#ff79c6', '#bd93f9', '#50fa7b', '#ebebeb')
+gray.to.red <- colorRampPalette(c(colour.palette[c(7, 1, 2)]))
 
 ui <- fluidPage(
   titlePanel('qibcPlot'),
@@ -171,8 +177,11 @@ server <- function(input, output, session) {
                  # Use colour (outline of pch 21) and set the stroke to occupy the whole geom_point
                  # This mimics fill, but loses the ability to add a point outline
                  aes(colour = get(input$colour))) + 
-      
-      scale_colour_gradient(trans = 'pseudo_log', low = 'gray', high = 'red') +
+      scale_colour_gradientn(colours = gray.to.red(3),
+                           values = c(0, 0.6, 1)
+                           #limits = colour.mm,
+                           #oob = scales::squish
+      ) +
       {if(input$ytrans == 'log10')scale_y_log10()} + # Select ylog10
       {if(input$ytrans == 'linear')scale_y_continuous()} + # Select y continuous
       # Theme
