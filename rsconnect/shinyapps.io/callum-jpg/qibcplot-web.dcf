@@ -1,0 +1,10 @@
+name: qibcplot-web
+title:
+username:
+account: callum-jpg
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2946156
+bundleId: 3704516
+url: https://callum-jpg.shinyapps.io/qibcplot-web/
+when: 1601908425.73169
