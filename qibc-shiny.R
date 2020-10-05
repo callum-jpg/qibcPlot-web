@@ -34,37 +34,17 @@ ui <- fluidPage(
   fluidRow(
     column(6,
            selectInput('x', 'X axis', choices = nms, selected = x.axis, width = '100%'),
-           #br(),
-           h3('Use metadata?'),
-           ## Checkbox TRUE for dev purposes. Switch back to FALSE
-           checkboxInput('meta_check', 'Use metadata?', FALSE, width = '100%'),
-           #br(),
-           selectInput('meta', 'Condition Name', ""),
+           selectInput('meta', 'Condition Name', choices = condition_names, width = "100%"),
            sliderInput('xlim', 'X min/max', min = 1, max = 1e7, value = c(1, 1e7), width = '100%'),
-           selectInput('colour', 'Point colour', choices = nms, selected = point.colour, width = '100%')),
+           sliderInput('colour_lim', 'colour min/max', min = 1, max = 3000, value = c(1, 100), width = '100%'),
+           br()),
+           
     column(6, 
            selectInput('y', 'Y axis', choices = nms, selected = y.axis, width = '100%'),
-           selectInput('meta_col', 'Metadata Column', "", width = "100%"),
-           selectInput('ytrans', 'y transformation', choices = trans, selected = 'log10', width = '100%'),
+           selectInput('colour', 'Point colour', choices = nms, selected = point.colour, width = '100%'),
            sliderInput('ylim', 'y min/max', min = 1, max = 1e7, value = c(1, 1e7), width = '100%'),
-           sliderInput('colour_lim', 'colour min/max', min = 1, max = 3000, value = c(1, 100), width = '100%'),
-           textOutput('test_print'))
-  ),
-  fluidRow(
-    column(3,
-           numericInput('xmin', 'x min', value = '')),
-    column(3, 
-           numericInput('xmax', 'x max', value = '')),
-    column(3, 
-           numericInput('ymin', 'y min', value = '')),
-    column(3, 
-           numericInput('ymax', 'y max', value = ''))
-  ),
-  fluidRow(
-    column(3, 
-           numericInput('colour_min', 'colour min', value = '')),
-    column(3,
-           numericInput('colour_max', 'colour max', value = ''))
+           selectInput('ytrans', 'y transformation', choices = trans, selected = 'log10', width = '100%'),
+           br()),
   )
 )
 
@@ -73,17 +53,7 @@ server <- function(input, output, session) {
   output$test_print <- renderText ({
     paste('print test:', nchar(input$xmin))
   })
-  observe({
-    ## Update meta_col with column names containing Metadata if meta_check is TRUE
-    {if(input$meta_check == TRUE)updateSelectInput(session, 'meta_col' , choices = meta.nms)
-      else updateSelectInput(session, 'meta_col', choices = "")}
-  })
-  
-  observe({
-    ## Update meta_col with column names containing Metadata if meta_check is TRUE
-    {if(nchar(input$meta_col) >= 1)updateSelectInput(session, 'meta' , choices = levels(input_data[,get(input$meta_col)]))
-      else updateSelectInput(session, 'meta' , choices = "")}
-  })
+
   
   observe({
     ## Updates min/max slider based on the min max values of the entire dataset
@@ -110,30 +80,10 @@ server <- function(input, output, session) {
   })
   
   dataset <- reactive({
-    input_data[
-      # If metadata is selected, filter dataset based on metadata values
-      {if(nchar(input$meta) >= 1)get(input$meta_col) == input$meta
-        # else, plot all available data
-        else '' %like% ''} 
-      
-      # Allow for numericInput to persist between metadata selections and override slider
-      # xlim from slider or textInput
-      & {if(nchar(input$xmin) >= 1 & nchar(input$xmax) >= 1 & 
-            # if NA, if does not evaluate
-            !is.na(nchar(input$xmin)) & !is.na(nchar(input$xmax)))get(input$x) %inrange% c(input$xmin, input$xmax)
-        else get(input$x) %inrange% input$xlim}
-      
-      # ylim from slider or textInput
-      & {if(nchar(input$ymin) >= 1 & nchar(input$ymax) >= 1 & 
-            !is.na(nchar(input$ymin)) & !is.na(nchar(input$ymax)))get(input$y) %inrange% c(input$ymin, input$ymax)
-        else get(input$y) %inrange% input$ylim}
-      
-      # colour limits from slider or textInput
-      & {if(nchar(input$colour_min) >= 1 & nchar(input$colour_max) >= 1 & 
-            !is.na(nchar(input$colour_min)) & !is.na(nchar(input$colour_max)))
-        get(input$colour) %inrange% c(input$colour_min, input$colour_max)
-        else get(input$colour) %inrange% input$colour_lim}
-    ]
+    input_data[get(metadata) == input$meta
+               & get(input$x) %inrange% input$xlim
+               & get(input$y) %inrange% input$ylim 
+               & get(input$colour) %inrange% input$colour_lim] 
   })
   
   output$qibcPlot <- renderPlotly({
