@@ -17,3 +17,7 @@ Specifically, the required system dependencies for installing plotly
 - Linux
   - libssl-dev
   - libcurl4-openssl-dev
+
+
+## Potential solution to point fill issue?
+https://stackoverflow.com/questions/53674051/ggplot2-fill-not-converting-ggplotly-color-mapping-correctly
