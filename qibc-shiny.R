@@ -66,12 +66,10 @@ ui <- fluidPage(
     column(3,
            numericInput('colour_max', 'colour max', value = ''))
   )
-  
-  
 )
 
 server <- function(input, output, session) {
-  
+
   output$test_print <- renderText ({
     paste('print test:', nchar(input$xmin))
   })
@@ -88,51 +86,27 @@ server <- function(input, output, session) {
   })
   
   observe({
-    ## Updating a xlim slider based on condition selected. Finds total dataset min max if no metadata selected.
-    {
-      if(nchar(input$meta) >= 1)
-        updateSliderInput(session, 'xlim', value = c(round(min(input_data[get(input$meta_col) == input$meta][[input$x]])),
-                                                     round(max(input_data[get(input$meta_col) == input$meta][[input$x]]))),
-                          min = round(min(input_data[get(input$meta_col) == input$meta][[input$x]])),
-                          max = round(max(input_data[get(input$meta_col) == input$meta][[input$x]])))
-      else 
+    ## Updates min/max slider based on the min max values of the entire dataset
         updateSliderInput(session, 'xlim', value = c(round(min(input_data[,get(input$x)])),
                                                      round(max(input_data[,get(input$x)]))),
                           min = round(min(input_data[,get(input$x)])),
                           max = round(max(input_data[,get(input$x)])))
-    }
   })
   
   observe({
-    ## Updating the ylim slider based on condition selected. Finds total dataset min max if no metadata selected.
-    {
-      if(nchar(input$meta) >= 1)
-        updateSliderInput(session, 'ylim', value = c(round(min(input_data[get(input$meta_col) == input$meta][[input$y]])),
-                                                     round(max(input_data[get(input$meta_col) == input$meta][[input$y]]))),
-                          min = round(min(input_data[get(input$meta_col) == input$meta][[input$y]])),
-                          max = round(max(input_data[get(input$meta_col) == input$meta][[input$y]])))
-      else 
+    ## Updates min/max slider based on the min max values of the entire dataset
         updateSliderInput(session, 'ylim', value = c(round(min(input_data[,get(input$y)])),
                                                      round(max(input_data[,get(input$y)]))),
                           min = round(min(input_data[,get(input$y)])),
                           max = round(max(input_data[,get(input$y)])))
-    }
   })
   
   observe({
-    ## Updating the point colour slider based on condition selected. Finds total dataset min max if no metadata selected.
-    {
-      if(nchar(input$meta) >= 1)
-        updateSliderInput(session, 'colour_lim', value = c(round(min(input_data[get(input$meta_col) == input$meta][[input$colour]])),
-                                                           round(max(input_data[get(input$meta_col) == input$meta][[input$colour]]))),
-                          min = round(min(input_data[get(input$meta_col) == input$meta][[input$colour]])),
-                          max = round(max(input_data[get(input$meta_col) == input$meta][[input$colour]])))
-      else 
+    ## ## Updates min/max slider based on the min max values of the entire dataset
         updateSliderInput(session, 'colour_lim', value = c(round(min(input_data[,get(input$colour)])),
                                                            round(max(input_data[,get(input$colour)]))),
                           min = round(min(input_data[,get(input$colour)])),
                           max = round(max(input_data[,get(input$colour)])))
-    }
   })
   
   dataset <- reactive({
@@ -184,6 +158,7 @@ server <- function(input, output, session) {
       ) +
       {if(input$ytrans == 'log10')scale_y_log10()} + # Select ylog10
       {if(input$ytrans == 'linear')scale_y_continuous()} + # Select y continuous
+      labs(colour = paste(input$colour)) +
       # Theme
       theme_minimal() +
       theme(
