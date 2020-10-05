@@ -3,6 +3,7 @@ library(plotly)
 library(shiny)
 library(data.table)
 library(RColorBrewer)
+library(rsconnect) # For hosting shiny app
 
 # for deployment-branch
 
