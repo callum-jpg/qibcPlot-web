@@ -27,8 +27,8 @@ gray.to.red <- colorRampPalette(c(colour.palette[c(7, 1, 2)]))
 
 ui <- fluidPage(
   titlePanel('qibcPlot'),
-  mainPanel('Quantative Image Based Cytometry (QIBC) data for TARG1 KO cells with +DarT WT or -DarT WT conditions.', width = '100%'),
-  mainPanel('This is a demo version for the Shiny app you can run locally with your own QIBC data.', width = '100%'),
+  mainPanel('Quantative Image Based Cytometry (QIBC) data visualisation for a +/- genotoxin treatment in U2OS.', width = '100%'),
+  mainPanel('This is a demo version for the Shiny app you can run locally with your own QIBC data, found', a('here', href='https://github.com/callum-jpg/qibcPlot-shiny', target="_blank"), width = '100%'),
   fluidRow(
     column(12, align = 'center', plotlyOutput('qibcPlot', height = '500px', width = '700px'))
   ),
